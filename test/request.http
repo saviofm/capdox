@@ -1,0 +1,135 @@
+@server = http://localhost:4004
+@me = Authorization: Basic {{$processEnv USER}}:
+@basic = Authorization: Basic admin:admin
+
+
+### ------------------------------------------------------------------------
+### ------------------------------------------------------------------------
+### -------------------------------CATALOG----------------------------------
+### ------------------------------------------------------------------------
+### ------------------------------------------------------------------------
+
+
+
+
+### Create Cnh
+POST  {{server}}/catalog/Cnh
+Accept: application/json
+Content-Type: application/json
+
+{ 
+  "ID": "cf31b7df-51a6-47a2-a860-f6f0e1e1960a",
+  "numeroRegistro": "7894900011530",
+  "nome": "Et Bilu",
+  "cpf": "22964328721",
+  "docIdentidade": "25442123",
+  "dataEmissao": "20240120",
+  "dataValidade": "20240120",
+  "obs": "Teste"
+}
+
+### Read Cnh
+GET {{server}}/catalog/Cnh
+
+
+### Read Cnh with filter
+GET {{server}}/catalog/Cnh?filter=(substringof(%27Et%27,nome)%20or%20substringof(%27Et%27,obs))
+
+### Read Cnh specific 
+GET {{server}}/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960e)
+
+
+
+
+### Read Binary
+GET {{server}}/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960e)/imageContent
+
+### Update Cnh
+PUT  {{server}}/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960e)
+Accept: application/json
+Content-Type: application/json
+
+{ 
+  "obs": "Desc produto alterado",
+  "imageType": "image/pdf"
+}
+
+### Upload Binary
+PUT {{server}}/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960e)/imageContent
+Content-Type: image/png
+
+< ./Test.jpg
+
+
+
+### Delete Cnh Content
+DELETE {{server}}/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960e)/imageContent
+
+### Delete Cnh 
+DELETE {{server}}/catalog/Cnh(80d94aaa-f9e1-4ee5-81a7-b4ae58ff573a)
+
+
+### ------------------------------------------------------------------------
+### ------------------------------------------------------------------------
+### ----------------------------CATALOG REST--------------------------------
+### ------------------------------------------------------------------------
+### ------------------------------------------------------------------------
+### ------------------------------------------------------------------------
+### ------------------------------------------------------------------------
+
+
+
+
+
+
+### Create Cnh
+POST  {{server}}/catalog-rest/Cnh
+Accept: application/json
+Content-Type: application/json
+
+{ 
+  "ID": "cf31b7df-51a6-47a2-a860-f6f0e1e1960a",
+  "numeroRegistro": "7894900011530",
+  "nome": "Et Bilu",
+  "cpf": "22964328721",
+  "docIdentidade": "25442123",
+  "dataEmissao": "20240120",
+  "dataValidade": "20240120",
+  "contentURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjWNMW/R8ABfwCjc2t99UAAAAASUVORK5CYII=" 
+}
+     
+
+### Read Cnh
+GET {{server}}/catalog-rest/Cnh
+
+
+### Read Cnh with filter
+GET {{server}}/catalog/Cnh?filter=(substringof(%27Et%27,nome)%20or%20substringof(%Et%27,cpf))
+
+
+### Read Cnh specific 
+GET {{server}}/catalog-rest/Cnh/cf31b7df-51a6-47a2-a860-f6f0e1e1960e
+
+
+### Read Binary
+GET   {{server}}/catalog-rest/Cnh/cf31b7df-51a6-47a2-a860-f6f0e1e1960e/imageContent
+
+
+### Create Cnh Image
+POST  {{server}}/catalog-rest/postImageContent
+Accept: application/json
+Content-Type: application/json
+
+{ 
+  "ID": "cf31b7df-51a6-47a2-a860-f6f0e1e1960a",
+  "contentURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjWNMW/R8ABfwCjc2t99UAAAAASUVORK5CYII="
+}
+
+### Delete Cnh 
+DELETE {{server}}/catalog-rest/Cnh/5f12027a-6f6b-426a-ade9-3fc2a6388f18
+
+
+
+### Delete Cnh Content
+POST {{server}}/catalog-rest/Cnh/cf31b7df-51a6-47a2-a860-f6f0e1e1960e/deleteImageContent
+

@@ -1,0 +1,136 @@
+_schema-version: '3.1'
+ID: capdox
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npx cds build --production
+modules:
+  - name: capdox-srv
+    type: nodejs
+    path: gen/srv
+    properties:
+      SAP_JWT_TRUST_ACL: '[{"clientid":"*","identityzone":"*"}]'  
+    parameters:
+      buildpack: nodejs_buildpack
+      disk-quota: 512M
+      memory: 256M
+    build-parameters:
+      builder: npm
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: capdox-db
+      - name: capdox-objectstore-service
+      - name: capdox-destination-service
+        parameters:
+          content-target: true
+      - name: default_sap-document-information-extraction
+  - name: capdox-db-deployer
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: capdox-db
+
+resources:
+  - name: capdox-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+  - name: capdox-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            destinations:
+            - Authentication: NoAuthentication
+              Name: ui5
+              ProxyType: Internet
+              Type: HTTP
+              URL: https://ui5.sap.com
+            - Name: capdox-srv-api
+              ProxyType: Internet
+              Type: HTTP
+              URL: ~{srv-api/srv-url}
+              Authentication: NoAuthentication
+              HTML5.DynamicDestination: true
+              HTML5.ForwardAuthToken: true        
+            existing_destinations_policy: update
+          subaccount:
+            destinations:
+            - Name: capdox
+              ProxyType: Internet
+              Type: HTTP
+              URL: ~{srv-api/srv-url}
+              Authentication: NoAuthentication
+              Description: CAP DOX Destination Service
+              HTML5.DynamicDestination: true
+              HTML5.ForwardAuthToken: true
+              HTML5.Timeout: 300000
+            - Name: capdox_rest
+              AppgyverEnabled: true
+              Authentication: NoAuthentication
+              Description: CAP DOX Rest
+              HTML5.DynamicDestination: true
+              HTML5.ForwardAuthToken: true
+              HTML5.Timeout: 300000
+              
+              ProxyType: Internet
+              Type: HTTP
+              URL: ~{srv-api/srv-url}/rest/catalog
+              WebIDEEnabled: true
+              WebIDEUsage: odata_gen
+              sap.applicationdevelopment.actions.enabled: true
+              sap.processautomation.enabled: true
+            - Name: capdox_odata
+              Authentication: NoAuthentication
+              Description: CAP DOX Odata        
+              ProxyType: Internet
+              Type: HTTP
+              URL: ~{srv-api/srv-url}/odata/v4/catalog
+              HTML5.DynamicDestination: true
+              HTML5.ForwardAuthToken: true
+              HTML5.Timeout: 300000
+              WebIDEEnabled: true
+              WebIDEUsage: odata_gen
+              sap.applicationdevelopment.actions.enabled: true
+              sap.processautomation.enabled: true
+              sap.build.usage: CAP
+              AppgyverEnabled: true  
+            - Name: capdox_odata_v2
+              Authentication: NoAuthentication
+              Description: CAP DOX Odata v2
+              ProxyType: Internet
+              Type: HTTP
+              URL: ~{srv-api/srv-url}/odata/v2/catalog
+              HTML5.DynamicDestination: true
+              HTML5.ForwardAuthToken: true
+              HTML5.Timeout: 300000 
+              WebIDEEnabled: true
+              WebIDEUsage: odata_gen
+            existing_destinations_policy: update
+        version: 1.0.0
+      service: destination
+      service-name: capdemandgen-destination-service
+      service-plan: lite
+    requires:
+      - name: srv-api
+  - name: capdox-objectstore-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: objectstore
+      service-name: capproducts-objectstore-service
+      service-plan: standard
+  - name: default_sap-document-information-extraction
+    type: org.cloudfoundry.existing-service

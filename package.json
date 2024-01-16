@@ -1,0 +1,46 @@
+{
+  "name": "capdox",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@cap-js-community/odata-v2-adapter": "1.12.2",
+    "@sap/cds": "7.5.2",
+    "@sap/cds-hana": "2",
+    "@sap/textbundle": "4.3.0",
+    "@sap/xsenv": "4.2.0",
+    "@types/node-fetch": "2.6.10",
+    "aws-sdk": "2.1532.0",
+    "cds-swagger-ui-express": "0.7.0",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@sap/cds-dk": "^7"
+  },
+  "engines": {
+    "node": "18.x.x",
+    "npm": "9.x.x"
+  },
+  "scripts": {
+    "start": "cds-serve"
+  },
+  "cds": {
+    "cov2ap": {
+      "plugin": true
+    },
+    "requires": {
+      "db": "hana"
+    },
+    "auth": {
+      "kind": "dummy"
+    },
+    "i18n": {
+      "folders": [
+        "_i18n",
+        "i18n"
+      ]
+    }
+  }
+}
