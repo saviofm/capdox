@@ -2,7 +2,7 @@ const cds = require('@sap/cds');
 const validation = require('./common/validation')
 const crud = require('./common/crud')
 const xsenv = require("@sap/xsenv");
-const AWS = require('aws-sdk');
+const {  S3Client } = require("@aws-sdk/client-s3");
 
 
 
@@ -21,20 +21,32 @@ class CatalogRest extends cds.ApplicationService {
 
         xsenv.loadEnv();
         const objectstore = xsenv.readServices()['capdox-objectstore-service'];
-        const bucket = objectstore.credentials.bucket
+        const bucket = objectstore.credentials.bucket;
+
+        const s3 = new S3Client({
+            region: objectstore.credentials.region,
+            credentials: {
+                accessKeyId: objectstore.credentials.access_key_id,
+                secretAccessKey: objectstore.credentials.secret_access_key
+            }
+        });
+
+
+        /*
         const credentials = new AWS.Credentials(
             objectstore.credentials.access_key_id,
             objectstore.credentials.secret_access_key
         );
+
         AWS.config.update({
             region: objectstore.credentials.region,
             credentials: credentials
+
         })
         const s3 = new AWS.S3({
             apiVersion: '2006-03-01'
         })
-
-        
+        */ 
          //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//

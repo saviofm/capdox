@@ -13,7 +13,7 @@
 
 
 ### Create Cnh
-POST  {{server}}/catalog/Cnh
+POST  {{server}}/odata/v4/catalog/Cnh
 Accept: application/json
 Content-Type: application/json
 
@@ -23,50 +23,50 @@ Content-Type: application/json
   "nome": "Et Bilu",
   "cpf": "22964328721",
   "docIdentidade": "25442123",
-  "dataEmissao": "20240120",
-  "dataValidade": "20240120",
+  "dataEmissao": "2024-01-20",
+  "dataValidade": "2024-01-20",
   "obs": "Teste"
 }
 
 ### Read Cnh
-GET {{server}}/catalog/Cnh
+GET {{server}}/odata/v4/catalog/Cnh
 
 
 ### Read Cnh with filter
-GET {{server}}/catalog/Cnh?filter=(substringof(%27Et%27,nome)%20or%20substringof(%27Et%27,obs))
+GET {{server}}/odata/v4/catalog/Cnh?filter=(substringof(%27Et%27,nome)%20or%20substringof(%27Et%27,obs))
 
 ### Read Cnh specific 
-GET {{server}}/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960e)
+GET {{server}}/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)
 
-
+### Read image Cnh specific 
+GET {{server}}/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)/imageContent
 
 
 ### Read Binary
-GET {{server}}/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960e)/imageContent
+GET {{server}}/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)
 
 ### Update Cnh
-PUT  {{server}}/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960e)
+PUT  {{server}}/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)
 Accept: application/json
 Content-Type: application/json
 
 { 
   "obs": "Desc produto alterado",
-  "imageType": "image/pdf"
+  "imageType": null
 }
 
 ### Upload Binary
-PUT {{server}}/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960e)/imageContent
-Content-Type: image/png
+PUT {{server}}/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)/imageContent
+Content-Type: image/jpeg
 
-< ./Test.jpg
-
+> ./Test.jpg
 
 
 ### Delete Cnh Content
-DELETE {{server}}/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960e)/imageContent
+DELETE {{server}}/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)/imageContent
 
 ### Delete Cnh 
-DELETE {{server}}/catalog/Cnh(80d94aaa-f9e1-4ee5-81a7-b4ae58ff573a)
+DELETE {{server}}/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)
 
 
 ### ------------------------------------------------------------------------

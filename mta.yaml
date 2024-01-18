@@ -17,8 +17,8 @@ modules:
       SAP_JWT_TRUST_ACL: '[{"clientid":"*","identityzone":"*"}]'  
     parameters:
       buildpack: nodejs_buildpack
-      disk-quota: 512M
-      memory: 256M
+      disk-quota: 1024M
+      memory: 512M
     build-parameters:
       builder: npm
     provides:
@@ -32,6 +32,8 @@ modules:
         parameters:
           content-target: true
       - name: default_sap-document-information-extraction
+      - name: sappsbr_dms_integration
+      - name: eventmesh_sappsbr
   - name: capdox-db-deployer
     type: hdb
     path: gen/db
@@ -122,7 +124,7 @@ resources:
             existing_destinations_policy: update
         version: 1.0.0
       service: destination
-      service-name: capdemandgen-destination-service
+      service-name: capdox-destination-service
       service-plan: lite
     requires:
       - name: srv-api
@@ -130,7 +132,11 @@ resources:
     type: org.cloudfoundry.managed-service
     parameters:
       service: objectstore
-      service-name: capproducts-objectstore-service
+      service-name: capdox-objectstore-service
       service-plan: standard
   - name: default_sap-document-information-extraction
+    type: org.cloudfoundry.existing-service
+  - name: sappsbr_dms_integration
+    type: org.cloudfoundry.existing-service
+  - name: eventmesh_sappsbr
     type: org.cloudfoundry.existing-service

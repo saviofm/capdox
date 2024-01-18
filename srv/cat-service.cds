@@ -6,10 +6,15 @@ service CatalogService {
     //Without Draft
     entity Cnh as projection on capdox.Cnh {
         *,
-        null as imageUrl  : String  @Core.MediaType: imageType, 
+        null as imageUrl  : String @Core.MediaType: imageType
     };
 
 
+
+    event cnhImageUpdated : {
+        ID : Cnh:ID;
+        imageType: Cnh:imageType;
+    }
 
     action postImageContent (ID: UUID, contentURL:LargeString);
 

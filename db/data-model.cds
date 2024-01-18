@@ -1,17 +1,17 @@
+namespace capdox;
+
 using {
   cuid,
   managed
 } from '@sap/cds/common';
-
-
-namespace capdox;
 
 //----------------------- PRODUCTS  ---------------------//
 //------------------------------------------------------//
 //------------------------------------------------------//
 //Entity
 entity Cnh : cuid , managed {
-      numeroRegistro : String;
+  @changelog 
+      numeroRegistro :  String;
       nome : localized String;
       cpf : String;
       docIdentidade: LargeString;
@@ -20,6 +20,8 @@ entity Cnh : cuid , managed {
       imageContent: LargeBinary @Core.MediaType: imageType;
       imageType : String @Core.IsMediaType: true; 
       obs: LargeString;
+      IDDOX: cuid:ID;
+      status: String;
 }
 
 
@@ -35,12 +37,13 @@ annotate Cnh with @(
     Value : numeroRegistro
   }]
 ) {
-  ID @(
+  ID @( 
         Core.Computed,
         Common.Text : {
             $value                 : numeroRegistro,
             ![@UI.TextArrangement] : #TextOnly
-        }
+        },
+      
   );
   numeroRegistro            @(
     title       : '{i18n>numeroRegistro}',
@@ -80,5 +83,13 @@ annotate Cnh with @(
   obs @(
     title       : '{i18n>obs}',
     description : '{i18n>obs}',
+  );
+  IDDOX @(
+    title       : '{i18n>iddox}',
+    description : '{i18n>iddox}',
+  );
+  status @(
+    title       : '{i18n>status}',
+    description : '{i18n>status}',
   )
 };

@@ -6,15 +6,21 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.490.0",
+    "@aws-sdk/lib-storage": "^3.490.0",
+    "@aws-sdk/s3-request-presigner": "^3.490.0",
     "@cap-js-community/odata-v2-adapter": "1.12.2",
+    "@cap-js/change-tracking": "^1.0.4",
     "@sap/cds": "7.5.2",
     "@sap/cds-hana": "2",
     "@sap/textbundle": "4.3.0",
+    "@sap/xb-msg-amqp-v100": "^0.9.58",
     "@sap/xsenv": "4.2.0",
+    "@sap/xssec": "3.6.1",
     "@types/node-fetch": "2.6.10",
-    "aws-sdk": "2.1532.0",
     "cds-swagger-ui-express": "0.7.0",
-    "express": "^4"
+    "express": "^4",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@sap/cds-dk": "^7"
@@ -31,10 +37,15 @@
       "plugin": true
     },
     "requires": {
-      "db": "hana"
-    },
-    "auth": {
-      "kind": "dummy"
+      "db": "hana",
+      "messaging": {
+        "kind": "enterprise-messaging",
+        "publishPrefix": "sappsbr/eventmesh/us10/",
+        "subscribePrefix": "sappsbr/eventmesh/us10/"
+      },
+      "auth": { 
+        "kind": "dummy-auth" 
+      } 
     },
     "i18n": {
       "folders": [

@@ -1,46 +1,71 @@
 const cds = require('@sap/cds');
-const fetch = require('node-fetch');
-function CnhRead(each, s3, bucket) {
+const { GetObjectCommand , PutObjectCommand, DeleteObjectCommand} = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const { Upload } = require('@aws-sdk/lib-storage');
+
+async function CnhRead(each, s3, bucket) {
     if (each?.imageType) {
-        const params = {
+        const command = new GetObjectCommand({
             Bucket: bucket,
             Key: each.ID
-        };
-        
+        });
+
         try {
-            each.imageUrl = s3.getSignedUrl('getObject', params) 
+            each.imageUrl =  await getSignedUrl(s3, command, { expiresIn: 3600 });
         } catch (error) {
             
         }
     }
 };
-
-async function CnhCreate(req, s3, bucket){
-    const tx = cds.transaction(req);
-    const contentType = req._.req.headers['content-type']
-    const params = {
+async function CnhReadStream(ID, s3, bucket) {
+    const command = new GetObjectCommand({
         Bucket: bucket,
-        Key: req.data.ID,
-        Body: req.data.imageContent,
-        ContentType: contentType
-    };
-    req.data.imageContent = null;
-    try {
-        
-   
-    const data = await s3.upload(params).promise();
+        Key: ID
+    });
 
-    return tx.update(cds.entities.Cnh)
-        .set({
-            imageType: contentType,
-        })
-        .where({
-            ID: req.data.ID
-        });
+    try {
+
+        const S3Item = await s3.send(command);
+
+        const WebStream = Readable.from(await S3Item.Body.transformToWebStream());
+     
+        return {
+            value: WebStream
+        };
+        //return  S3Item.Body.transformToWebStream();
     } catch (error) {
-      console.log(error);
+        
     }
 };
+
+async function CnhCreate(req, s3, bucket){
+    //const tx = cds.transaction(req);
+    //const msg = cds.connect.to('messaging')
+
+    const contentType = req._.req.headers['content-type']
+    const upload = new Upload({
+        client: s3,
+        params: {
+            Bucket: bucket,
+            Key: req.data.ID,
+            Body: req.data.imageContent,
+            ContentType: contentType
+        }
+    });
+
+    //req.data.imageContent = null;
+    try {
+        
+    await upload.done();
+    //Evento atualizar imagem
+
+
+    } catch (error) {
+      console.log(error);
+      throw(error);
+    }
+};
+
 
 async function CnhUpdate(req){
     
@@ -55,12 +80,16 @@ async function CnhDelete(req, s3, bucket){
         let delObject =  await tx.read(cds.services.CatalogService.entities.Cnh, ['imageType'])
             .where({ID: req.data.ID});
         if (delObject.length > 0 && delObject[0].imageType){              
-            const params = {
+            const command = new DeleteObjectCommand({
                 Bucket: bucket,
                 Key: req.data.ID
-            };
-            await s3.deleteObject(params).promise();
-        
+            });
+            await s3.send(command);
+            try {
+                const response = await s3.send(command); 
+            } catch (err) {
+                console.log(err);
+            }
         
 
             if (req.data.imageContent !== undefined && req.data.imageContent === null) {
@@ -157,11 +186,11 @@ async function postImageContentRest(req, s3, bucket) {
 
 module.exports = {
     CnhRead,
+    CnhReadStream,
     CnhCreate,
     CnhUpdate,
     CnhDelete,
     CnhDeleteRest,
     imageContentRest,
-    postImageContentRest,
-    
+    postImageContentRest
 }
