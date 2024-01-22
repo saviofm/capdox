@@ -1,0 +1,28 @@
+{
+    "xsappname": "capdox",
+    "tenant-mode": "dedicated",
+    "description": "Security profile of called application",
+    "scopes": [      
+      {
+        "name": "uaa.user",
+        "description": "UAA"
+      },
+      {
+        "name": "$XSAPPNAME.emcallback",
+        "description": "Event Mesh Callback Access",
+        "grant-as-authority-to-apps": [
+          "$XSSERVICENAME(eventmesh_sappsbr)"
+        ]
+      }
+    ],
+    "attributes": [],
+    "role-templates": [                                 
+      {
+        "name": "Token_Exchange",
+        "description": "UAA",
+        "scope-references": [
+          "uaa.user"
+        ]
+      }
+    ]
+}

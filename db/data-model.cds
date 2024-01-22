@@ -1,17 +1,18 @@
+namespace capdox;
+
 using {
   cuid,
   managed
 } from '@sap/cds/common';
-
-
-namespace capdox;
 
 //----------------------- PRODUCTS  ---------------------//
 //------------------------------------------------------//
 //------------------------------------------------------//
 //Entity
 entity Cnh : cuid , managed {
-      numeroRegistro : String;
+  @changelog 
+      processID: cuid:ID;
+      numeroRegistro :  String;
       nome : localized String;
       cpf : String;
       docIdentidade: LargeString;
@@ -20,6 +21,8 @@ entity Cnh : cuid , managed {
       imageContent: LargeBinary @Core.MediaType: imageType;
       imageType : String @Core.IsMediaType: true; 
       obs: LargeString;
+      IDDOX: cuid:ID;
+      status: String;
 }
 
 
@@ -35,29 +38,34 @@ annotate Cnh with @(
     Value : numeroRegistro
   }]
 ) {
-  ID @(
+  ID @( 
         Core.Computed,
         Common.Text : {
             $value                 : numeroRegistro,
             ![@UI.TextArrangement] : #TextOnly
-        }
+        },
+      
+  );
+  processID @(
+    title       : '{i18n>processID}',
+    description : '{i18n>processID}'
   );
   numeroRegistro            @(
     title       : '{i18n>numeroRegistro}',
     description : '{i18n>numeroRegistro}',
-    Common      : {
-        FieldControl             : #Mandatory,
+    //Common      : {
+    //    FieldControl             : #Mandatory,
     //  Text : {
     //    $value                 : productDescription,
     //    ![@UI.TextArrangement] : #TextLast
     //  }
-    }
+    //}
   );
   nome @(
     title       : '{i18n>nome}',
     description : '{i18n>nome}',
     Common      : {
-      FieldControl : #Mandatory,
+      //FieldControl : #Mandatory,
       TextFor      : numeroRegistro
     }
   );
@@ -80,5 +88,13 @@ annotate Cnh with @(
   obs @(
     title       : '{i18n>obs}',
     description : '{i18n>obs}',
+  );
+  IDDOX @(
+    title       : '{i18n>iddox}',
+    description : '{i18n>iddox}',
+  );
+  status @(
+    title       : '{i18n>status}',
+    description : '{i18n>status}',
   )
 };

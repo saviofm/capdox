@@ -12,9 +12,9 @@
     "@sap/textbundle": "4.3.0",
     "@sap/xsenv": "4.2.0",
     "@types/node-fetch": "2.6.10",
-    "aws-sdk": "2.1532.0",
     "cds-swagger-ui-express": "0.7.0",
-    "express": "^4"
+    "express": "^4",
+    "form-data": "^4.0.0"
   },
   "devDependencies": {
     "@sap/cds-dk": "^7"
@@ -34,7 +34,7 @@
       "db": "hana",
       "auth": {
         "kind": "dummy-auth"
-      },
+      }
     },
     "i18n": {
       "folders": [

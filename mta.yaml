@@ -27,6 +27,7 @@ modules:
           srv-url: ${default-url}
     requires:
       - name: capdox-db
+      - name: capdox-xsuaa-service
       - name: capdox-destination-service
         parameters:
           content-target: true
@@ -121,9 +122,23 @@ resources:
             existing_destinations_policy: update
         version: 1.0.0
       service: destination
-      service-name: capdemandgen-destination-service
+      service-name: capdox-destination-service
       service-plan: lite
+      service-key:
+        name: capdox-destination-service-key
     requires:
       - name: srv-api
+  - name: capdox-xsuaa-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-name: capdox-xsuaa-service
+      service-plan: application
+      service-key:
+        name: capdox-xsuaa-service-key
+  - name: sappsbr_dms_integration
+    type: org.cloudfoundry.existing-service  
   - name: default_sap-document-information-extraction
     type: org.cloudfoundry.existing-service
+  

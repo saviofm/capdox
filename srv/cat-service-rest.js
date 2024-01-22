@@ -2,7 +2,6 @@ const cds = require('@sap/cds');
 const validation = require('./common/validation')
 const crud = require('./common/crud')
 const xsenv = require("@sap/xsenv");
-const AWS = require('aws-sdk');
 
 
 
@@ -10,29 +9,6 @@ const AWS = require('aws-sdk');
 
 class CatalogRest extends cds.ApplicationService {
     init() {
-
-        //----------------------------------------------------------------------------------//
-        //----------------------------------------------------------------------------------//
-        //----------------------------------------------------------------------------------//
-        // INIT - Instanciando S3                                                           //
-        //----------------------------------------------------------------------------------//
-        //----------------------------------------------------------------------------------//
-        //----------------------------------------------------------------------------------//
-
-        xsenv.loadEnv();
-        const objectstore = xsenv.readServices()['capdox-objectstore-service'];
-        const bucket = objectstore.credentials.bucket
-        const credentials = new AWS.Credentials(
-            objectstore.credentials.access_key_id,
-            objectstore.credentials.secret_access_key
-        );
-        AWS.config.update({
-            region: objectstore.credentials.region,
-            credentials: credentials
-        })
-        const s3 = new AWS.S3({
-            apiVersion: '2006-03-01'
-        })
 
         
          //----------------------------------------------------------------------------------//
@@ -70,7 +46,7 @@ class CatalogRest extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         this.after('READ', 'Cnh', (each, req) => {
             if (!req.headers['content-type'] || !req.headers['content-type'] === 'application/octet-stream') {
-                crud.CnhRead(each, s3, bucket);
+                crud.CnhRead(each);
             }
         });
         
@@ -95,7 +71,7 @@ class CatalogRest extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         this.on('UPDATE', ['Cnh'], async (req, next) => {
             if (req.data.imageContent) {
-                return await crud.CnhCreate(req, s3, bucket)
+                return await crud.CnhCreate(req)
             } else {
                 return next();
             }
@@ -113,7 +89,7 @@ class CatalogRest extends cds.ApplicationService {
            
             await validation.CnhDelete(req);
 
-            return await crud.CnhDelete(req, s3, bucket);
+            return await crud.CnhDelete(req);
             
         });
         //----------------------------------------------------------------------------------//
@@ -124,7 +100,7 @@ class CatalogRest extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         this.on('postImageContent', async (req) => {
-            return await crud.postImageContentRest(req, s3, bucket);   
+            return await crud.postImageContentRest(req);   
            
         
         });
@@ -136,7 +112,7 @@ class CatalogRest extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         this.on('imageContent', 'Cnh', async (req) => {
-            return await crud.imageContentRest(req, s3, bucket);   
+            return await crud.imageContentRest(req);   
         });
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
@@ -146,7 +122,7 @@ class CatalogRest extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         this.on('deleteImageContent', 'Cnh', async (req) => {            
-            return crud.CnhDeleteRest(req, s3, bucket); 
+            return crud.CnhDeleteRest(req); 
               
         });
 
