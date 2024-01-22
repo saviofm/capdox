@@ -31,10 +31,10 @@
       "plugin": true
     },
     "requires": {
-      "db": "hana"
-    },
-    "auth": {
-      "kind": "dummy"
+      "db": "hana",
+      "auth": {
+        "kind": "dummy-auth"
+      },
     },
     "i18n": {
       "folders": [

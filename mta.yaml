@@ -27,7 +27,6 @@ modules:
           srv-url: ${default-url}
     requires:
       - name: capdox-db
-      - name: capdox-objectstore-service
       - name: capdox-destination-service
         parameters:
           content-target: true
@@ -126,11 +125,5 @@ resources:
       service-plan: lite
     requires:
       - name: srv-api
-  - name: capdox-objectstore-service
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: objectstore
-      service-name: capproducts-objectstore-service
-      service-plan: standard
   - name: default_sap-document-information-extraction
     type: org.cloudfoundry.existing-service
