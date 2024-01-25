@@ -10,11 +10,13 @@
     "@sap/cds": "7.5.2",
     "@sap/cds-hana": "2",
     "@sap/textbundle": "4.3.0",
+    "@sap/xb-msg-amqp-v100": "^0.9.58",
     "@sap/xsenv": "4.2.0",
     "@types/node-fetch": "2.6.10",
     "cds-swagger-ui-express": "0.7.0",
     "express": "^4",
-    "form-data": "^4.0.0"
+    "form-data": "^4.0.0",
+    "node-fetch": "2.x.x"
   },
   "devDependencies": {
     "@sap/cds-dk": "^7"
@@ -34,6 +36,14 @@
       "db": "hana",
       "auth": {
         "kind": "dummy-auth"
+      },
+      "messaging": {
+        "[hybrid]": {
+          "kind": "enterprise-messaging-shared"
+        },
+        "[production]": {
+          "kind": "enterprise-messaging"
+        }
       }
     },
     "i18n": {

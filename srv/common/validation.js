@@ -4,18 +4,20 @@ const { getBundle } = require('./i18n');
 async function CnhCreate(req){
     let bundle = getBundle(req.user.locale);
     const tx = cds.transaction(req);
-    let numeroRegistro = req.data.numeroRegistro.replace(" ",""); 
-           
-    let oCnh =  await tx.read(cds.services.CatalogService.entities.Cnh, ['ID'])
-                        .where(
-                            { 
-                                numeroRegistro: numeroRegistro
-                            }
-                        );
+    if (req.data.numeroRegistro) {
+        let numeroRegistro = req.data.numeroRegistro.replace(" ",""); 
+            
+        let oCnh =  await tx.read(cds.services.CatalogService.entities.Cnh, ['ID'])
+                            .where(
+                                { 
+                                    numeroRegistro: numeroRegistro
+                                }
+                            );
 
-    if (oCnh.length > 0) {
-        const txt = bundle.getText("mERROR_UNIQUE",[req.data.numeroRegistro, bundle.getText("mNumeroRegistro")]);
-        return req.error(410, txt);
+        if (oCnh.length > 0) {
+            const txt = bundle.getText("mERROR_UNIQUE",[req.data.numeroRegistro, bundle.getText("mNumeroRegistro")]);
+            return req.error(410, txt);
+        }
     }
 };
 
@@ -23,6 +25,7 @@ async function CnhUpdate(req){
     let bundle = getBundle(req.user.locale);
     const tx = cds.transaction(req);
     //Validar Numero Registro
+    /*
     let numeroRegistro = req.data.numeroRegistro?.replace(" ","");     
     if (numeroRegistro) {
     let oCnh =  await tx.read(cds.services.CatalogService.entities.Cnh, ['ID'])
@@ -39,7 +42,7 @@ async function CnhUpdate(req){
             return req.error(410, txt);
         }
     }
-
+    */
     //Validar ImageType
     if (req.data.imageType !== undefined){
         if(req.data.imageType === null){

@@ -7,7 +7,19 @@ service CatalogService {
     entity Cnh as projection on capdox.Cnh {
         *
     };
+    
+   
 
+    action postImageContent (content: LargeBinary) returns {};
+                             
 
-    action postImageContent (ID: UUID, contentURL:LargeString);
+    event returnDOXDaata: {
+        ID: Cnh:ID;
+        IDDOX: Cnh:IDDOX;
+        Retry: Integer;
+    };
+
+    event postDOXDaata: {
+        ID: Cnh:ID;
+    };
 }

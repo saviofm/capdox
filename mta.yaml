@@ -32,6 +32,7 @@ modules:
         parameters:
           content-target: true
       - name: default_sap-document-information-extraction
+      - name: eventmesh_sappsbr
   - name: capdox-db-deployer
     type: hdb
     path: gen/db
@@ -46,6 +47,8 @@ resources:
     parameters:
       service: hana
       service-plan: hdi-shared
+      service-key:
+        name: capdox-db-key
   - name: capdox-destination-service
     type: org.cloudfoundry.managed-service
     parameters:
@@ -84,8 +87,7 @@ resources:
               Description: CAP DOX Rest
               HTML5.DynamicDestination: true
               HTML5.ForwardAuthToken: true
-              HTML5.Timeout: 300000
-              
+              HTML5.Timeout: 300000        
               ProxyType: Internet
               Type: HTTP
               URL: ~{srv-api/srv-url}/rest/catalog
@@ -141,4 +143,7 @@ resources:
     type: org.cloudfoundry.existing-service  
   - name: default_sap-document-information-extraction
     type: org.cloudfoundry.existing-service
+  - name: eventmesh_sappsbr
+    type: org.cloudfoundry.existing-service
+
   

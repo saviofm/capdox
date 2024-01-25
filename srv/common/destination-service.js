@@ -1,22 +1,29 @@
 const fetch = require('node-fetch');
 const xsenv = require('@sap/xsenv');
 
+
 let service = null;
 //Service
 async function serviceCall(method, name, path, headers, body) {
+  
   xsenv.loadEnv();
   service = xsenv.readServices()[name];
   const serviceUrl = await getDestinationUrlService(service);
   const jwtToken = await getJWTTokenService();
+  
+  let basicAuthorization = `Bearer ${jwtToken}`;
   if (!headers) {
     headers = new fetch.Headers({
-      'Content-Type': 'application/json'
-    });
+      "Authorization" : basicAuthorization,
+      "Accept": "application/json"
+    });  
+  } else {
+    headers.set("Authorization", basicAuthorization);
   }
-  let basicAuthorization = `Bearer ${jwtToken}`;
-  headers.set("Authorization", basicAuthorization);
-  const response = await fetch(serviceUrl + path, { method: method, headers: headers, body })
-  return await response.text();
+  const response = await fetch(serviceUrl + path, { method: method, headers: headers, body: body })
+  const responseText = await response.text();
+  return responseText;
+  
 }
 
 
@@ -28,12 +35,14 @@ async function getJWTTokenService() {
   const clientId = credentials.uaa.clientid;
   const secret = credentials.uaa.clientsecret;
   const authUrl = credentials.uaa.url;
-  const headers = new fetch.Headers();
+  //const headers = fetch.headers();
   let authorization = `Basic ${Buffer.from(clientId + ':' + secret).toString("base64")}`;
-  headers.set("Authorization", authorization);
+  const headers = {
+    "Authorization": authorization
+  };
   let url = authUrl + '/oauth/token?grant_type=client_credentials&response_type=token';
-  const result = await fetch(url, { method: 'GET', headers: headers }).then((res)=>{
-    return res.json()
+  const result =  await fetch(url, { method: 'GET', headers: headers }).then(async (res)=>{
+    return await  res.json()
   });
   return result.access_token;
 }
