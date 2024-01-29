@@ -3,6 +3,7 @@ const { Readable } = require('stream');
 const cds = require('@sap/cds');
 const { serviceCall } = require('./destination-service');
 const { update } = require('@sap/cds/libx/_runtime/hana/execute');
+const { Console } = require('console');
 function CnhRead(each, bucket) {
 
 };
@@ -21,7 +22,7 @@ async function CnhDelete(req, s3, bucket){
 };
 
 async function doxUpload(ID) {
-    
+
     const tx = cds.tx();
 
     const formData = new FormData();
@@ -42,14 +43,17 @@ async function doxUpload(ID) {
     formData.append("options", JSON.stringify(oOptions));
     formData.append('file',imageContent, 'cnhfile_'+ ID + '.' + imageType.split('/')[1]);
     
-    const response = await serviceCall( 'POST', 'custom-service:default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs', null, formData );
+    console.log('ID: '+ID)
+    const response = await serviceCall( 'POST', 'default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs', null, formData );
     responseOjb = JSON.parse(response)
     if (responseOjb.status = 'PENDING') {
         await tx.run(UPDATE(Cnh).set({ IDDOX : responseOjb.id, status: responseOjb.status}).where({ID:ID}));
         await tx.commit();
+        console.log('IDDOX: '+ responseOjb.id)
         return { ID: ID,
                  IDDOX: responseOjb.id,
                  Retry: 3 };
+       
     }
 }
 
@@ -59,7 +63,7 @@ async function doxReturn(event) {
     const { Cnh } = cds.entities
     const tx = cds.tx();
     
-    const response = await serviceCall( 'GET', 'custom-service:default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs/'+event.IDDOX , null, null );
+    const response = await serviceCall( 'GET', 'default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs/'+event.IDDOX , null, null );
     responseObj = JSON.parse(response)
     if (responseObj.status == 'DONE') {
         let updateSet = {status : responseObj.status};

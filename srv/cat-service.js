@@ -185,6 +185,7 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         this.on('postDOXData', async (msg) => {
                 //Call DOX
+                console.log('Call POST DOX DATA')
                 const idEvent = await crud.doxUpload(msg.data);
                 if (idEvent) {
                     this.emit('returnDOXData' , idEvent );

@@ -42,7 +42,7 @@
           "kind": "enterprise-messaging-shared"
         },
         "[production]": {
-          "kind": "enterprise-messaging"
+          "kind": "enterprise-messaging-shared"
         }
       }
     },

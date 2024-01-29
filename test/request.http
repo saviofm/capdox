@@ -54,6 +54,13 @@ Content-Type: image/jpeg
 < ./download.jpg
 
 
+### Upload Binary
+PUT https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.us10.hana.ondemand.com/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)/imageContent
+Content-Type: image/jpeg
+
+< ./download.jpg
+
+
 ### Post Image Content
 POST  {{server}}/odata/v4/catalog/postImageContent
 Content-Type: image/jpeg

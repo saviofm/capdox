@@ -1,0 +1,78 @@
+{
+  "requires": {
+    "[hybrid]": {
+      "sappsbr_dms_integration": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.us10.hana.ondemand.com",
+          "org": "SAP Presales Brazil - BTP_sap-presales-br-usa",
+          "space": "DEV",
+          "instance": "sappsbr_dms_integration",
+          "key": "sappsbr_dms_integration-key",
+          "resolved": false
+        },
+        "vcap": {
+          "name": "sappsbr_dms_integration"
+        }
+      },
+      "default_sap-document-information-extraction": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.us10.hana.ondemand.com",
+          "org": "SAP Presales Brazil - BTP_sap-presales-br-usa",
+          "space": "DEV",
+          "instance": "default_sap-document-information-extraction",
+          "key": "default_sap-document-information-extraction-key",
+          "resolved": false
+        },
+        "vcap": {
+          "name": "default_sap-document-information-extraction"
+        }
+      },
+      "destinations": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.us10.hana.ondemand.com",
+          "org": "SAP Presales Brazil - BTP_sap-presales-br-usa",
+          "space": "DEV",
+          "instance": "capdox-destination-service",
+          "key": "capdox-destination-service-key",
+          "resolved": false
+        },
+        "kind": "destinations",
+        "vcap": {
+          "name": "destinations"
+        }
+      },
+      "db": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.us10.hana.ondemand.com",
+          "org": "SAP Presales Brazil - BTP_sap-presales-br-usa",
+          "space": "DEV",
+          "instance": "capdox-db",
+          "key": "capdox-db-key",
+          "resolved": false
+        },
+        "kind": "hana-cloud",
+        "vcap": {
+          "name": "db"
+        }
+      },
+      "eventmesh_sappsbr": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.us10.hana.ondemand.com",
+          "org": "SAP Presales Brazil - BTP_sap-presales-br-usa",
+          "space": "DEV",
+          "instance": "eventmesh_sappsbr",
+          "key": "eventmesh_sappsbr-key",
+          "resolved": false
+        },
+        "vcap": {
+          "name": "eventmesh_sappsbr"
+        }
+      }
+    }
+  }
+}
