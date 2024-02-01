@@ -31,6 +31,7 @@ modules:
       - name: capdox-destination-service
         parameters:
           content-target: true
+      - name: capdox-objectstore-service
       - name: default_sap-document-information-extraction
       - name: eventmesh_sappsbr
   - name: capdox-db-deployer
@@ -139,6 +140,14 @@ resources:
       service-plan: application
       service-key:
         name: capdox-xsuaa-service-key
+  - name: capdox-objectstore-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: objectstore
+      service-name: capdox-objectstore-service
+      service-plan: standard
+      service-key:
+        name: capdox-objectstore-service-key        
   - name: sappsbr_dms_integration
     type: org.cloudfoundry.existing-service  
   - name: default_sap-document-information-extraction

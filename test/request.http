@@ -19,12 +19,18 @@ Content-Type: application/json
 
 { 
 
-  "processID": "957a53fd-11a1-4c6c-804c-c956cb976f22"
-
+    "ID": "957a53fd-11a1-4c6c-804c-c956cb976f22"
+  
 }
 
 ### Read Cnh
 GET {{server}}/odata/v4/catalog/Cnh
+
+### GET UPLOAD URL
+GET {{server}}/odata/v4/catalog/getupurl(imagetype=%27image%2Fpng%27)
+
+### GET UPLOD URL EXTERNAL
+GET https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.us10.hana.ondemand.com/odata/v4/catalog/getupurl(imagetype=%27image%2Fpng%27)
 
 
 ### Read Cnh with filter
@@ -54,6 +60,15 @@ Content-Type: image/jpeg
 < ./download.jpg
 
 
+
+
+### Upload Binary
+PUT {{server}}/odata/v4/catalog/Cnh(957a53fd-11a1-4c6c-804c-c956cb976f22)/imageContent
+Content-Type: image/png
+
+< ./Test.png
+
+
 ### Upload Binary
 PUT https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.us10.hana.ondemand.com/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)/imageContent
 Content-Type: image/jpeg
@@ -72,8 +87,8 @@ Content-Type: image/jpeg
 DELETE {{server}}/odata/v4/catalog/Cnh(957a53fd-11a1-4c6c-804c-c956cb976f22)/imageContent
 
 ### Delete Cnh 
-DELETE {{server}}/odata/v4/catalog/Cnh(957a53fd-11a1-4c6c-804c-c956cb976f22)
+DELETE {{server}}/odata/v4/catalog/Cnh(ea8c9918-dca5-419a-82cc-2e6f41ac4948)
 
 
 ### Delete Cnh 
-DELETE {{server}}/odata/v4/catalog/Cnh(f613edd1-49ae-4837-8fc2-f59834952017)
+DELETE {{server}}/odata/v4/catalog/Cnh(6fc2f475-530f-4d7d-9286-ad0ae4256dcc)

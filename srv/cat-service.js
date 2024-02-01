@@ -2,7 +2,7 @@ const cds = require('@sap/cds');
 const validation = require('./common/validation')
 const crud = require('./common/crud')
 const xsenv = require("@sap/xsenv");
-
+const {  S3Client } = require("@aws-sdk/client-s3");
 
 
 class CatalogService extends cds.ApplicationService {
@@ -17,7 +17,16 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
 
         xsenv.loadEnv();
+        const objectstore = xsenv.readServices()['capdox-objectstore-service'];
+        const bucket = objectstore.credentials.bucket;
 
+        const s3 = new S3Client({
+            region: objectstore.credentials.region,
+            credentials: {
+                accessKeyId: objectstore.credentials.access_key_id,
+                secretAccessKey: objectstore.credentials.secret_access_key
+            }
+        });
 
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
@@ -38,13 +47,8 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         this.on('CREATE', ['Cnh'], async (req, next) => {
-            /*if (req.data.imageContent) {
-                return await crud.CnhCreate(req)
-            } else {
-                
-            }
-            */
 
+            
             return next();
         }); 
         //----------------------------------------------------------------------------------//
@@ -55,12 +59,6 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         this.after('CREATE', ['Cnh'], async (Cnh) => {
-            /*if (req.data.imageContent) {
-                return await crud.CnhCreate(req)
-            } else {
-                
-            }
-            */
 
            
         }); 
@@ -71,15 +69,15 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
-        this.on('READ', ['Cnh'], (req, next) => {
-            /*
-            if (req.data.ID && req.query._streaming) {            
+        this.on('READ', ['Cnh'], async (req, next) => {
             
+            if (req.data.ID && req.query._streaming) {            
+                return await crud.CnhReadS3Stream(req.data.ID, s3, bucket)  
             } else {
-                
+                return next()    
             }
-            */
-            return next()
+            
+   
         });
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
@@ -88,12 +86,15 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
-        this.after('READ', ['Cnh'], (each, req) => {
-            /*
+        this.after('READ', ['Cnh'], async (aCnh, req) => {
+            
             if (!req.query._streaming) {
-                crud.CnhRead(each);
+                for (let Cnh of aCnh) 
+                    Cnh.imageUrl = Cnh.imgUrl = await crud.CnhReadS3Url(Cnh, s3, bucket);
+                    
+                
             }
-            */
+         
         });
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
@@ -114,14 +115,20 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         this.on('UPDATE', ['Cnh'], async (req, next) => {
-            /*
+            
             if (req.data.imageContent) {
-                return await crud.CnhCreate(req)
+                try {
+                    return await crud.CnhCreateS3(req, s3, bucket)
+                } catch (error) {
+                     error.code = "404" 
+                    throw(error)
+                }
+                
             } else {
-             
+                return next();
             }
-            */
-            return next();
+            
+       
         });
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
@@ -131,18 +138,9 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         this.after('UPDATE', ['Cnh'], async (Cnh) => {
-            /*
-            if (req.data.imageContent) {
-                return await crud.CnhCreate(req)
-            } else {
-             
-            }
-            */
             if (Cnh.imageContent) {
-
-                    this.emit('postDOXData' , Cnh.ID );
-     
-            }
+                this.emit('postDOXData' , Cnh.ID );
+             }
         });
 
         //----------------------------------------------------------------------------------//
@@ -155,9 +153,9 @@ class CatalogService extends cds.ApplicationService {
         this.before('DELETE', ['Cnh'], async (req) => {
            
             await validation.CnhDelete(req);
-        /*
-            return await crud.CnhDelete(req);
-        */   
+        
+            return await crud.CnhDelete(req, s3, bucket);
+          
         });
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
@@ -167,13 +165,7 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         this.on('DELETE', ['Cnh'], async (req, next) => {
-            /*
-            if (req.data.imageContent) {
-                return await crud.CnhCreate(req)
-            } else {
-             
-            }
-            */
+ 
             return next();
         });
         //----------------------------------------------------------------------------------//
@@ -186,10 +178,12 @@ class CatalogService extends cds.ApplicationService {
         this.on('postDOXData', async (msg) => {
                 //Call DOX
                 console.log('Call POST DOX DATA')
-                const idEvent = await crud.doxUpload(msg.data);
+                const idEvent = await crud.doxUpload(msg.data, s3, bucket);
                 if (idEvent) {
                     this.emit('returnDOXData' , idEvent );
                 }  
+
+
             
         });
 
@@ -222,6 +216,22 @@ class CatalogService extends cds.ApplicationService {
            
         
         });
+
+        //----------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------//
+        // Cnh -  FUNCTION CONTENT - getUpUrl                               //
+        //----------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------//
+        this.on('getupurl', async (req) => {
+            return await crud.CnhGetUpUrl(req,s3, bucket);   
+           
+        
+        });
+
+        
+
         return super.init();
     }
 }

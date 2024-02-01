@@ -1,4 +1,4 @@
-@server = http://localhost:4004
+@server = http://localhost:51105
 @me = Authorization: Basic {{$processEnv USER}}:
 @basic = Authorization: Basic admin:admin
 
@@ -17,51 +17,53 @@
 
 
 ### Create Cnh
-POST  {{server}}/catalog-rest/Cnh
+POST  {{server}}/rest/catalog-rest/Cnh
 Accept: application/json
 Content-Type: application/json
 
 { 
-  "numeroRegistro": "7894900011530",
-  "nome": "Et Bilu",
-  "cpf": "22964328721",
-  "docIdentidade": "25442123",
-  "dataEmissao": "20240120",
-  "dataValidade": "20240120",
-  "contentURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjWNMW/R8ABfwCjc2t99UAAAAASUVORK5CYII=" 
+  "ID": "957a53fd-11a1-4c6c-804c-c956cb976f22"
 }
      
 
 ### Read Cnh
-GET {{server}}/catalog-rest/Cnh
+GET {{server}}/rest/catalog-rest/Cnh
 
 
 ### Read Cnh with filter
-GET {{server}}/catalog/Cnh?filter=(substringof(%27Et%27,nome)%20or%20substringof(%Et%27,cpf))
+GET {{server}}/rest/catalog-rest/Cnh?filter=(substringof(%27Et%27,nome)%20or%20substringof(%Et%27,OBS))
 
 
 ### Read Cnh specific 
-GET {{server}}/catalog-rest/Cnh/cf31b7df-51a6-47a2-a860-f6f0e1e1960e
+GET {{server}}/rest/catalog-rest/Cnh/957a53fd-11a1-4c6c-804c-c956cb976f22
 
 
 ### Read Binary
-GET   {{server}}/catalog-rest/Cnh/cf31b7df-51a6-47a2-a860-f6f0e1e1960e/imageContent
+GET   {{server}}/rest/catalog-rest/Cnh/957a53fd-11a1-4c6c-804c-c956cb976f22/imageContent
 
 
-### Create Cnh Image
-POST  {{server}}/catalog-rest/postImageContent
+### Post Image content Create Cnh Image
+POST  {{server}}/rest/catalog-rest/postImageContent
 Accept: application/json
 Content-Type: application/json
 
 { 
-  "ID": "cf31b7df-51a6-47a2-a860-f6f0e1e1960a",
+  "ID": "957a53fd-11a1-4c6c-804c-c956cb976f22",
   "contentURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjWNMW/R8ABfwCjc2t99UAAAAASUVORK5CYII="
 }
 
+
+### Upload Binary
+PUT {{server}}/rest/catalog-rest/Cnh/957a53fd-11a1-4c6c-804c-c956cb976f22/imageContent
+Content-Type: image/jpeg
+
+< ./download.jpg
+
+
 ### Delete Cnh 
-DELETE {{server}}/catalog-rest/Cnh/5f12027a-6f6b-426a-ade9-3fc2a6388f18
+DELETE {{server}}/rest/catalog-rest/Cnh/957a53fd-11a1-4c6c-804c-c956cb976f22
 
 
 
 ### Delete Cnh Content
-POST {{server}}/catalog-rest/Cnh/cf31b7df-51a6-47a2-a860-f6f0e1e1960e/deleteImageContent
+POST {{server}}/rest/catalog-rest/Cnh/957a53fd-11a1-4c6c-804c-c956cb976f22/deleteImageContent

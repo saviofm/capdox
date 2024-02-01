@@ -14,4 +14,7 @@ service CatalogRest {
     
     action postImageContent(ID: UUID, contentURL:LargeString);
 
+
+
+    
 }

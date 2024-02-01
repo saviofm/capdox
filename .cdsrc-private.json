@@ -72,6 +72,20 @@
         "vcap": {
           "name": "eventmesh_sappsbr"
         }
+      },
+      "capdox-objectstore-service": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.us10.hana.ondemand.com",
+          "org": "SAP Presales Brazil - BTP_sap-presales-br-usa",
+          "space": "DEV",
+          "instance": "capdox-objectstore-service",
+          "key": "capdox-objectstore-service-key",
+          "resolved": false
+        },
+        "vcap": {
+          "name": "capdox-objectstore-service"
+        }
       }
     }
   }

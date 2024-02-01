@@ -5,21 +5,23 @@ service CatalogService {
 
     //Without Draft
     entity Cnh as projection on capdox.Cnh {
-        *
+        *,
+        null as imageUrl  : String @Core.IsURL @Core.MediaType: imageType,
+        null as imgUrl: String ,
     };
     
-   
+    type url {};   
 
-    action postImageContent (content: LargeBinary) returns {};
-                             
+    function getupurl(imagetype: String) returns {url:String; ID:UUID};
 
-    event returnDOXDaata: {
-        ID: Cnh:ID;
-        IDDOX: Cnh:IDDOX;
-        Retry: Integer;
+ 
+    annotate Cnh with {
+    imageUrl @(
+        title       : '{i18n>imageUrl}',
+        description : '{i18n>imageUrl}',
+        
+      );
     };
 
-    event postDOXDaata: {
-        ID: Cnh:ID;
-    };
+
 }
