@@ -14,7 +14,7 @@ cds.on("bootstrap", app => {
             (req, res, next) => {
                 const { origin } = req.headers
                 // standard request
-                res.set('access-control-allow-origin', '*');
+                res.set('access-control-allow-origin', origin);
                 // preflight request
                 if (origin  && req.method === 'OPTIONS')
                     return res.set('access-control-allow-methods', 'GET,HEAD,PUT,PATCH,POST,DELETE').end()

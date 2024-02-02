@@ -2,11 +2,10 @@ const FormData = require('form-data');
 const { Readable } = require('stream');
 const cds = require('@sap/cds');
 const { serviceCall } = require('./destination-service');
-const { update } = require('@sap/cds/libx/_runtime/hana/execute');
-const { Console } = require('console');
 const { GetObjectCommand , PutObjectCommand, DeleteObjectCommand} = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { Upload } = require('@aws-sdk/lib-storage');
+const fetch = require('node-fetch');
 
 function CnhRead(each, bucket) {
 
@@ -90,11 +89,22 @@ async function CnhCreateS3(req,s3,bucket){
     }
 };
 
-async function CnhGetUpUrl(req, s3, bucket) {
+async function uploadCnh(req, s3, bucket) {
 
     const service = cds.services.CatalogService;
     const tx = service.tx();
+    let blobres;
+    //let blob = await fetch(req.data.url).then(r => r.blob());
+    await fetch(req.data.BlobUrl)
+    .then(res => res.blob())
+    .then(res=> {
+      console.log("blob: "+res)
+      blobres = res;    
+    });
+    
+
     //Faz criação via serviço
+
     oCnh = await tx.create(service.entities.Cnh).entries({ });
     
     const command = new PutObjectCommand({
@@ -339,7 +349,7 @@ module.exports = {
     CnhReadS3Stream,
     CnhCreate,
     CnhCreateS3,
-    CnhGetUpUrl,
+    uploadCnh,
     CnhUpdate,
     CnhDelete,
     CnhDeleteRest,

@@ -10,11 +10,14 @@ service CatalogService {
         null as imgUrl: String ,
     };
     
-    type url {};   
+    type CnhType {
+        imageContent: LargeBinary @Core.MediaType: imagetype;
+        imagetype: String
+    };   
+    
+    action uploadcnh(BlobUrl: String) returns {};
 
-    function getupurl(imagetype: String) returns {url:String; ID:UUID};
-
- 
+    
     annotate Cnh with {
     imageUrl @(
         title       : '{i18n>imageUrl}',

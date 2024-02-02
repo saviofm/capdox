@@ -67,3 +67,11 @@ DELETE {{server}}/rest/catalog-rest/Cnh/957a53fd-11a1-4c6c-804c-c956cb976f22
 
 ### Delete Cnh Content
 POST {{server}}/rest/catalog-rest/Cnh/957a53fd-11a1-4c6c-804c-c956cb976f22/deleteImageContent
+
+
+### Upload Binary
+    
+PUT https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.us10.hana.ondemand.com/rest/catalog-rest/Cnh/c1514537-e5f1-492d-adf9-c70415f39d8a/imageContent   
+Content-Type: image/jpeg
+
+< ./download.jpg

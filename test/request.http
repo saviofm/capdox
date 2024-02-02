@@ -26,8 +26,14 @@ Content-Type: application/json
 ### Read Cnh
 GET {{server}}/odata/v4/catalog/Cnh
 
-### GET UPLOAD URL
-GET {{server}}/odata/v4/catalog/getupurl(imagetype=%27image%2Fpng%27)
+
+###  UPLOAD Cnh
+POST {{server}}/odata/v4/catalog/uploadcnh
+Content-Type: application/json
+
+{
+"BlobUrl":"blob:https://sap-presales-br-usa.preview.us10.apps.build.cloud.sap/d18d24ef-9675-412c-abbf-fb1f23ff32da"
+}
 
 ### GET UPLOD URL EXTERNAL
 GET https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.us10.hana.ondemand.com/odata/v4/catalog/getupurl(imagetype=%27image%2Fpng%27)
@@ -63,14 +69,16 @@ Content-Type: image/jpeg
 
 
 ### Upload Binary
-PUT {{server}}/odata/v4/catalog/Cnh(957a53fd-11a1-4c6c-804c-c956cb976f22)/imageContent
+PUT {{server}}/odata/v4/catalog/Cnh/957a53fd-11a1-4c6c-804c-c956cb976f22/imageContent
 Content-Type: image/png
 
 < ./Test.png
 
 
 ### Upload Binary
-PUT https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.us10.hana.ondemand.com/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)/imageContent
+    
+PUT https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.us10.hana.ondemand.com/odata/v4/catalog/Cnh/c1514537-e5f1-492d-adf9-c70415f39d8a/imageContent   
+#https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.us10.hana.ondemand.com/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)/imageContent
 Content-Type: image/jpeg
 
 < ./download.jpg

@@ -224,8 +224,8 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
-        this.on('getupurl', async (req) => {
-            return await crud.CnhGetUpUrl(req,s3, bucket);   
+        this.on('uploadcnh', async (req) => {
+            return await crud.uploadCnh(req,s3, bucket);   
            
         
         });
