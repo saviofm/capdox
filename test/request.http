@@ -35,6 +35,18 @@ Content-Type: application/json
 "BlobUrl":"blob:https://sap-presales-br-usa.preview.us10.apps.build.cloud.sap/d18d24ef-9675-412c-abbf-fb1f23ff32da"
 }
 
+###  UPLOAD Cnh DMS
+POST {{server}}/odata/v4/catalog/uploadcnhdms
+Content-Type: application/json
+
+{
+ "folder": "spa-res:cmis:folderid:Z5Y-hiVH2pt6NAZ8z0h1j5xKSgfHSdWT5aGNKabZFZg"
+}
+
+
+
+
+
 ### GET UPLOD URL EXTERNAL
 GET https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.us10.hana.ondemand.com/odata/v4/catalog/getupurl(imagetype=%27image%2Fpng%27)
 

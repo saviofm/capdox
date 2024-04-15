@@ -6,6 +6,16 @@ const { GetObjectCommand , PutObjectCommand, DeleteObjectCommand} = require("@aw
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { Upload } = require('@aws-sdk/lib-storage');
 const fetch = require('node-fetch');
+const currentDate = new Date();
+const oOptions = {
+    clientId: "default",
+    documentType: "custom",
+    receivedDate: currentDate.toISOString().split("T")[0],
+    schemaId: "3ad2d0c5-2bd2-454a-bd8f-fb3d99d9953e",
+    //templateId: "4a067ddb-bbca-44ec-ab7c-cbc00caedd48",
+    enrichment: { } 
+
+}
 
 function CnhRead(each, bucket) {
 
@@ -62,10 +72,10 @@ async function CnhCreateS3(req,s3,bucket){
         }
     });
 
-        const oCnh = await tx.run(SELECT.one().from(cds.entities.Cnh).where({ID:req.data.ID}));
-        if (oCnh === null)  throw new Error(`ID ${req.data.ID} not found`);
+    const oCnh = await tx.run(SELECT.one().from(cds.entities.Cnh).where({ID:req.data.ID}));
+    if (oCnh === null)  throw new Error(`ID ${req.data.ID} not found`);
 
-        try {
+    try {
         await upload.done();
         //Evento atualizar imagem
         
@@ -89,45 +99,77 @@ async function CnhCreateS3(req,s3,bucket){
     }
 };
 
-async function uploadCnh(req, s3, bucket) {
 
+async function uploadCnhDMS(req, s3, bucket) {
+    const formData = new FormData();
     const service = cds.services.CatalogService;
     const tx = service.tx();
-    let blobres;
-    //let blob = await fetch(req.data.url).then(r => r.blob());
-    await fetch(req.data.BlobUrl)
-    .then(res => res.blob())
-    .then(res=> {
-      console.log("blob: "+res)
-      blobres = res;    
-    });
-    
+    const dmsDirectoryID = 'dbad265f-2da5-41ef-b114-c3f9976f9a20'
+    const folderID = req.data.folder.replace('spa-res:cmis:folderid:', '');
 
-    //Faz criação via serviço
-
-    oCnh = await tx.create(service.entities.Cnh).entries({ });
-    
-    const command = new PutObjectCommand({
-        Bucket: bucket,
-        Key: oCnh.ID
-    });
-    try {         
-        const url = await getSignedUrl(s3, command, { expiresIn: 3600 }, (err,url)=>  url );
-        //Atualiza direto na entidade o imagetype
-        await tx.update(cds.entities.Cnh)
-        .set({
-            imageType: req.data.imagetype,
-        })
-        .where({
-            ID: oCnh.ID
-        });
-        await tx.commit();
-        return { url: url,
-                 ID: oCnh.ID};
-    } catch (error) {            
+    //Fazer chamada de DMS para obter a folder
+    const response = await serviceCall( 'GET', 'text', 'sappsbr_dms_integration', 'browser/' + dmsDirectoryID + '/root?objectId=' + folderID, null, null );
+    responseObj = JSON.parse(response)
+   
+    //Em caso de erro retorna
+    if (!responseObj.objects[0]) {
+        req.error(410, "not found");
     }
-};
+    //Obtem caracteristicas do documento armazenado no DMS
+    dmsObj = responseObj.objects[0].object.properties
+    dmsObjID = dmsObj['cmis:objectId'].value
+    dmsObjName = dmsObj['cmis:name'].value
+    dmsMimeType = dmsObj['cmis:contentStreamMimeType'].value
 
+    //Obtem o documento em formato BLOB
+    const responseDMS = await serviceCall( 'GET', 'blob', 'sappsbr_dms_integration', 'browser/' + dmsDirectoryID + '/root?objectId=' + dmsObjID, null, null );
+    
+    //Converte pra readableStream
+    const stream = await responseDMS.stream();
+    
+    try {
+        console.log('UPLOAD DMS - STEP 2 - call dox ')
+ 
+        //Montar formulário
+        formData.append("options", JSON.stringify(oOptions));
+        formData.append('file', stream, dmsObjName);
+        
+
+        const responseDOX = await serviceCall( 'POST', 'text', 'default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs', null, formData );
+        responseDOXParsed = JSON.parse(responseDOX)
+        if (responseDOXParsed.status = 'PENDING') {
+            console.log('UPLOAD DMS - STEP 2 - return dox: '+ responseDOX)
+ 
+      
+            oCnh = await tx.create(service.entities.Cnh).entries({
+                imageType: dmsMimeType,
+                IDDOX : responseDOXParsed.id, 
+                status: responseDOXParsed.status});
+
+            const upload = new Upload({
+                client: s3,
+                params: {
+                    Bucket: bucket,
+                    Key: oCnh.ID,
+                    Body: stream,
+                    ContentType: oCnh.imageType
+                }
+            });
+            await upload.done();
+            await tx.commit();
+            console.log('IDDOX: '+ responseDOXParsed.id)
+            oCnh.createdAt = '';
+            oCnh.modifiedAt = ''; 
+            return  oCnh ;
+        
+        }
+       
+    } catch (error) {
+      console.log(error);
+      throw(error);
+    }
+
+};
 
 
 async function CnhReadS3Url(each, s3, bucket) {
@@ -278,41 +320,26 @@ async function doxUpload(ID, s3, bucket) {
         Bucket: bucket,
         Key: ID
     });
-    let currentDate = new Date();
+
     const { imageType} = await tx.run(SELECT.one('imageContent','imageType').from(Cnh).where({ID:ID}));
     
     const S3Item = await s3.send(command);
 
     const WebStream = Readable.from(await S3Item.Body.transformToWebStream());
      
-
-    
-    
-    
-   
      
-    const oOptions = {
-       clientId: "default",
-       documentType: "custom",
-       receivedDate: currentDate.toISOString().split("T")[0],
-       schemaId: "a478d00c-e4df-4145-a301-6b5d7bd8d2f5",
-       templateId: "4a067ddb-bbca-44ec-ab7c-cbc00caedd48",
-       enrichment: { } 
-
-    }
+    //Montar formulário
     formData.append("options", JSON.stringify(oOptions));
     formData.append('file', WebStream, 'cnhfile_'+ ID + '.' + imageType.split('/')[1]);
     
     console.log('ID: '+ID)
-    const response = await serviceCall( 'POST', 'default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs', null, formData );
+    const response = await serviceCall( 'POST', 'text', 'default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs', null, formData );
     responseOjb = JSON.parse(response)
     if (responseOjb.status = 'PENDING') {
-        await tx.run(UPDATE(Cnh).set({ IDDOX : responseOjb.id, status: responseOjb.status}).where({ID:ID}));
+        const oCNH = await tx.run(UPDATE(Cnh).set({ IDDOX : responseOjb.id, status: responseOjb.status}).where({ID:ID}));
         await tx.commit();
-        console.log('IDDOX: '+ responseOjb.id)
-        return { ID: ID,
-                 IDDOX: responseOjb.id,
-                 Retry: 3 };
+        console.log('IDDOX: '+ JSON.stringify(oCNH))
+        return oCNH;
        
     }
 }
@@ -323,17 +350,22 @@ async function doxReturn(event) {
     const { Cnh } = cds.entities
     const tx = cds.tx();
     
-    const response = await serviceCall( 'GET', 'default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs/'+event.IDDOX , null, null );
+    const response = await serviceCall( 'GET', 'text', 'default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs/'+ event.IDDOX , null, null );
     responseObj = JSON.parse(response)
     if (responseObj.status == 'DONE') {
         let updateSet = {status : responseObj.status};
-        for (const headerfield of  responseObj.extraction.headerFields){
-         updateSet[headerfield.name] = headerfield.value
-         if ( headerfield.name == 'cpf' ||
-              headerfield.name == 'docIdentidade' ||
-              headerfield.name == 'numeroRegistro'  ) {
+        for (const headerfield of responseObj.extraction.headerFields){
+            updateSet[headerfield.name] = headerfield.value
+            if ( headerfield.name == 'nome' || 
+                headerfield.name == 'numeroRegistro'||
+                headerfield.name == 'dataEmissao' ||
+                headerfield.name == 'cpf' ||
+                headerfield.name == 'docIdentidade' ||
+                headerfield.name == 'dataValidade'  ||
+                headerfield.name == 'dataNascimento' 
+                ) {
                 updateSet[headerfield.name] = updateSet[headerfield.name].replace(/\D/g, "");;
-         }
+            }
         }
         await tx.run(UPDATE(Cnh).set(updateSet).where({ID:event.ID}));
         await tx.commit();
@@ -349,7 +381,7 @@ module.exports = {
     CnhReadS3Stream,
     CnhCreate,
     CnhCreateS3,
-    uploadCnh,
+    uploadCnhDMS,
     CnhUpdate,
     CnhDelete,
     CnhDeleteRest,

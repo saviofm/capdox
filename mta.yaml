@@ -17,7 +17,7 @@ modules:
       SAP_JWT_TRUST_ACL: '[{"clientid":"*","identityzone":"*"}]'  
     parameters:
       buildpack: nodejs_buildpack
-      disk-quota: 512M
+      disk-quota: 1024M
       memory: 256M
     build-parameters:
       builder: npm
@@ -34,6 +34,7 @@ modules:
       - name: capdox-objectstore-service
       - name: default_sap-document-information-extraction
       - name: eventmesh_sappsbr
+      - name: sappsbr_dms_integration
   - name: capdox-db-deployer
     type: hdb
     path: gen/db

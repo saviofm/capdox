@@ -18,6 +18,7 @@ entity Cnh : cuid , managed {
       docIdentidade: LargeString;
       dataEmissao :  Date;
       dataValidade : Date;
+      dataNascimento: Date;
       imageContent: LargeBinary @Core.MediaType: imageType;
       imageType : String @Core.IsMediaType: true; 
       obs: LargeString;
@@ -84,6 +85,10 @@ annotate Cnh with @(
   dataValidade @(
     title       : '{i18n>dataValidade}',
     description : '{i18n>dataValidade}',
+  );
+  dataNascimento@(
+    title       : '{i18n>dataNascimento}',
+    description : '{i18n>dataNascimento}',
   );
   obs @(
     title       : '{i18n>obs}',

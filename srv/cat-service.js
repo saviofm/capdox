@@ -176,11 +176,10 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         this.on('postDOXData', async (msg) => {
-                //Call DOX
-                console.log('Call POST DOX DATA')
-                const idEvent = await crud.doxUpload(msg.data, s3, bucket);
-                if (idEvent) {
-                    this.emit('returnDOXData' , idEvent );
+
+                const oCNH = await crud.doxUpload(msg.data, s3, bucket);
+                if (oCNH) {
+                    this.emit('returnDOXData' , oCNH );
                 }  
 
 
@@ -195,7 +194,7 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         this.on('returnDOXData', async (msg) => {
-            for (let i = 0; i < msg.data.Retry; i++) {
+            for (let i = 0; i < 30; i++) {
                 await new Promise(resolve => setTimeout(resolve, 30000));
                 const ok = await crud.doxReturn(msg.data);
                 
@@ -220,13 +219,22 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
-        // Cnh -  FUNCTION CONTENT - getUpUrl                               //
+        // Cnh -  FUNCTION CONTENT - uplodadcnhDMS                                                //
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------//
-        this.on('uploadcnh', async (req) => {
-            return await crud.uploadCnh(req,s3, bucket);   
-           
+        this.on('uploadcnhdms', async (req) => {
+            try {
+                console.log('UPLOAD DMS - STEP 0')
+                const oCnh = await crud.uploadCnhDMS(req,s3, bucket);
+                if (oCnh.IDDOX) {
+                    this.emit('returnDOXData' , oCnh );
+                };
+                return oCnh;
+            } catch (error) {
+                throw error
+            }
+              
         
         });
 

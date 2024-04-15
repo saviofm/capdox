@@ -10,12 +10,9 @@ service CatalogService {
         null as imgUrl: String ,
     };
     
-    type CnhType {
-        imageContent: LargeBinary @Core.MediaType: imagetype;
-        imagetype: String
-    };   
+
     
-    action uploadcnh(BlobUrl: String) returns {};
+    action uploadcnhdms(folder: String) returns Cnh;
 
     
     annotate Cnh with {
