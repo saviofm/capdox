@@ -1,4 +1,4 @@
-@server = http://localhost:4004
+@server = http://localhost:58068
 @me = Authorization: Basic {{$processEnv USER}}:
 @basic = Authorization: Basic admin:admin
 
@@ -40,7 +40,7 @@ POST {{server}}/odata/v4/catalog/uploadcnhdms
 Content-Type: application/json
 
 {
- "folder": "spa-res:cmis:folderid:Z5Y-hiVH2pt6NAZ8z0h1j5xKSgfHSdWT5aGNKabZFZg"
+ "folder": "spa-res:cmis:folderid:Ozbq2kvETi1CXFahZOmykRtjPlH_fLfauWNvZv_fGqY"
 }
 
 
@@ -55,7 +55,7 @@ GET https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.
 GET {{server}}/odata/v4/catalog/Cnh?filter=(substringof(%27Et%27,nome)%20or%20substringof(%27Et%27,obs))
 
 ### Read Cnh specific 
-GET {{server}}/odata/v4/catalog/Cnh(957a53fd-11a1-4c6c-804c-c956cb976f22)
+GET {{server}}/odata/v4/catalog/Cnh(42e47c74-22a9-4c56-a60c-d234cefdc348)
 
 ### Read image Cnh specific 
 GET {{server}}/odata/v4/catalog/Cnh(957a53fd-11a1-4c6c-804c-c956cb976f22)/imageContent

@@ -8,10 +8,7 @@ async function serviceCall(method, returnType, name, path, headers, body) {
   
   xsenv.loadEnv();
   console.log('UPLOAD DMS - STEP 1 folder')
-  console.log('UPLOAD DMS - STEP 1 folder')
-
-  console.log('UPLOAD DMS - STEP 1 - total services: '+JSON.stringify(xsenv.readServices()))
-  console.log('UPLOAD DMS - STEP 1 - service to get: '+ name)
+  
   service = xsenv.readServices()[name];
   const serviceUrl = await getDestinationUrlService(service);
   const jwtToken = await getJWTTokenService();
@@ -25,7 +22,7 @@ async function serviceCall(method, returnType, name, path, headers, body) {
   } else {
     headers.set("Authorization", basicAuthorization);
   }
-  console.log('UPLOAD DMS - STEP 2 - call '+JSON.stringify(service))
+
  
   const response = await fetch(serviceUrl + path, { method: method, headers: headers, body: body })
 

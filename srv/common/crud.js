@@ -126,6 +126,8 @@ async function uploadCnhDMS(req, s3, bucket) {
     
     //Converte pra readableStream
     const stream = await responseDMS.stream();
+    const arrayBuffer = await responseDMS.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
     
     try {
         console.log('UPLOAD DMS - STEP 2 - call dox ')
@@ -138,7 +140,7 @@ async function uploadCnhDMS(req, s3, bucket) {
         const responseDOX = await serviceCall( 'POST', 'text', 'default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs', null, formData );
         responseDOXParsed = JSON.parse(responseDOX)
         if (responseDOXParsed.status = 'PENDING') {
-            console.log('UPLOAD DMS - STEP 2 - return dox: '+ responseDOX)
+            
  
       
             oCnh = await tx.create(service.entities.Cnh).entries({
@@ -151,15 +153,16 @@ async function uploadCnhDMS(req, s3, bucket) {
                 params: {
                     Bucket: bucket,
                     Key: oCnh.ID,
-                    Body: stream,
+                    Body: buffer ,
                     ContentType: oCnh.imageType
                 }
             });
             await upload.done();
             await tx.commit();
-            console.log('IDDOX: '+ responseDOXParsed.id)
-            oCnh.createdAt = '';
-            oCnh.modifiedAt = ''; 
+            oCnh =  await SELECT.one().from(cds.entities.Cnh).where({ID:oCnh.ID});
+            console.log('cnh: '+ JSON.stringify(oCnh))
+            //oCnh.createdAt = '';
+            //oCnh.modifiedAt = ''; 
             return  oCnh ;
         
         }
@@ -355,17 +358,33 @@ async function doxReturn(event) {
     if (responseObj.status == 'DONE') {
         let updateSet = {status : responseObj.status};
         for (const headerfield of responseObj.extraction.headerFields){
-            updateSet[headerfield.name] = headerfield.value
-            if ( headerfield.name == 'nome' || 
-                headerfield.name == 'numeroRegistro'||
+            //movimentação normal
+            if (headerfield.name == 'nome') {
+                updateSet[headerfield.name] = headerfield.value 
+                continue;
+            }
+            //movimentação data
+            if ( 
                 headerfield.name == 'dataEmissao' ||
-                headerfield.name == 'cpf' ||
-                headerfield.name == 'docIdentidade' ||
                 headerfield.name == 'dataValidade'  ||
                 headerfield.name == 'dataNascimento' 
-                ) {
-                updateSet[headerfield.name] = updateSet[headerfield.name].replace(/\D/g, "");;
+            ) {
+                updateSet[headerfield.name] = headerfield.value + 'T04:00:00.000Z' 
+                continue;      
             }
+
+            //Retirar letras e espaçoes
+            if ( 
+                headerfield.name == 'cpf' ||
+                headerfield.name == 'docIdentidade' ||
+                headerfield.name == 'numeroRegistro'  
+            ) {                
+                updateSet[headerfield.name] = headerfield.value
+                updateSet[headerfield.name] = updateSet[headerfield.name].replace(/\D/g, "");
+                continue;
+            }
+
+
         }
         await tx.run(UPDATE(Cnh).set(updateSet).where({ID:event.ID}));
         await tx.commit();
