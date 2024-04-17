@@ -1,7 +1,7 @@
 const FormData = require('form-data');
 const { Readable } = require('stream');
 const cds = require('@sap/cds');
-const { serviceCall } = require('./destination-service');
+const { serviceCall, getDestinationUrl } = require('./destination-service');
 const { GetObjectCommand , PutObjectCommand, DeleteObjectCommand} = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { Upload } = require('@aws-sdk/lib-storage');
@@ -174,7 +174,12 @@ async function uploadCnhDMS(req, s3, bucket) {
 
 };
 
+async function getURL(req) {
+    return await getDestinationUrl('capdox_odata');
+};
 
+
+  
 async function CnhReadS3Url(each, s3, bucket) {
     if (each?.imageType) {
         const command = new GetObjectCommand({
@@ -242,77 +247,6 @@ async function CnhDeleteRest(req, bucket){
     }
     
 };
-
-async function imageContentRest(req, s3, bucket) {
-    let oCnh = await cds.run(req.query);
-    if (oCnh.length > 0) {
-        oCnh = oCnh[0];
-        const command = new GetObjectCommand({
-            Bucket: bucket,
-            Key: ID
-        });
-    
-        try {
-    
-            const S3Item = await s3.send(command);
-     
-            return S3Item.Body
-       
-        } catch (error) {
-           throw(error) 
-        }          
-    } else {
-        req.error(410, "not found");
-    }
-    
-};
-
-async function postImageContentRest(req,s3, bucket) {
-    const tx = cds.transaction(req);
-    const oCnh = await tx.run(SELECT.one().from(cds.entities.Cnh).where({ID:req.data.ID}));
-    if (oCnh === null)  throw new Error(`ID ${req.data.ID} not found`);
-
-
-     // separate out the mime component
-     let contentType = req.data.contentURL.split(',')[0].split(':')[1].split(';')[0]
-     let contentEncoding = req.data.contentURL.split(',')[0].split(':')[1].split(';')[1]
-     let data = req.data.contentURL.split(',')[1]; 
-     let buf = Buffer.from(data,contentEncoding);
-
-     const upload = new Upload({
-        client: s3,
-        params: {
-            Bucket: bucket,
-            Key: req.data.ID,
-            Body: buf,
-            ContentType: contentType
-        }
-    });
-
-    try {
-        await upload.done();
-        //Evento atualizar imagem
-        
-
-        oCnh.imageContent = req.data.imageContent;
-        oCnh.imageType = contentType
-
-        await tx.update(cds.entities.Cnh)
-            .set({
-                imageType: contentType,
-            })
-            .where({
-                ID: req.data.ID
-            });
-        
-        return oCnh;
-       
-    } catch (error) {
-      console.log(error);
-      throw(error);
-    }
-}
-
 
 async function doxUpload(ID, s3, bucket) {
 
@@ -388,8 +322,31 @@ async function doxReturn(event) {
         }
         await tx.run(UPDATE(Cnh).set(updateSet).where({ID:event.ID}));
         await tx.commit();
+        var delDOXDone = JSON.stringify({
+            "value": [
+                event.IDDOX
+            ]
+        });
+       
+        const responseDelDOXDone = await serviceCall( 'DELETE', 'text', 'default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs' , null, delDOXDone );
+  
         return true;
     } 
+    //Em caso de outro status que não seja pendente, eliminar o DOX
+    if (!responseObj.status == 'PENDING') {
+        
+        var delDOXErro = JSON.stringify({
+            "value": [
+                event.IDDOX
+            ]
+        });
+       
+        const responseDelDOXErro = await serviceCall( 'DELETE', 'text', 'default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs' , null, delDOXErro );
+  
+        await tx.run(UPDATE(Cnh).set({status : responseObj.status}).where({ID:event.ID}));
+        await tx.commit();
+        return true;
+    }   
     return false;
 }
 
@@ -404,9 +361,7 @@ module.exports = {
     CnhUpdate,
     CnhDelete,
     CnhDeleteRest,
-    imageContentRest,
-    postImageContentRest,
     doxUpload,
-    doxReturn
- 
+    doxReturn,
+    getURL
 }

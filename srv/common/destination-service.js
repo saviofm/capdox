@@ -61,6 +61,7 @@ async function getJWTTokenService() {
 //Other calls
 async function otherServiceCall(name, path, method, headers, body) {
   xsenv.loadEnv();
+    
   const serviceUrl = await getDestinationUrl(name);
   const jwtToken = await getJWTToken('sapxpsp-xsuaa-service');
   if (!headers) {
@@ -84,7 +85,9 @@ async function otherServiceCall(name, path, method, headers, body) {
 
 
 async function getDestinationUrl(name) {
-  const destinationServiceName = 'sapxpsp-destination-service'
+  xsenv.loadEnv();
+
+  const destinationServiceName = 'capdox-destination-service'
   var jwt = await getJWTToken(destinationServiceName);
   const host = xsenv.getServices({ tag: destinationServiceName }).tag.uri
   const headers = new fetch.Headers();
@@ -119,4 +122,5 @@ module.exports = {
   serviceCall : serviceCall,
   getJWTToken : getJWTToken,
   getDestinationUrl : getDestinationUrl
+  
 }

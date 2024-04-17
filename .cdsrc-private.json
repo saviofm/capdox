@@ -29,7 +29,7 @@
           "name": "default_sap-document-information-extraction"
         }
       },
-      "destinations": {
+      "capdox-destination-service": {
         "binding": {
           "type": "cf",
           "apiEndpoint": "https://api.cf.us10.hana.ondemand.com",

@@ -195,7 +195,7 @@ class CatalogService extends cds.ApplicationService {
         //----------------------------------------------------------------------------------//
         this.on('returnDOXData', async (msg) => {
             for (let i = 0; i < 30; i++) {
-                await new Promise(resolve => setTimeout(resolve, 30000));
+                await new Promise(resolve => setTimeout(resolve, 5000));
                 const ok = await crud.doxReturn(msg.data);
                 
                 if (ok){
@@ -238,7 +238,26 @@ class CatalogService extends cds.ApplicationService {
         
         });
 
+        //----------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------//
+        // Cnh -  FUNCTION CONTENT - uplodadcnhDMS                                                //
+        //----------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------//
+        this.on('getURL', async (req) => {
+            try {
+
+                const url = await crud.getURL(req);
+                
+                return url;
+            } catch (error) {
+                throw error
+            }
+              
         
+        });
+       
 
         return super.init();
     }

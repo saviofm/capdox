@@ -14,7 +14,8 @@ service CatalogService {
     
     action uploadcnhdms(folder: String) returns Cnh;
 
-    
+    function getURL() returns String;
+
     annotate Cnh with {
     imageUrl @(
         title       : '{i18n>imageUrl}',

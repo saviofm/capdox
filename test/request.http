@@ -1,4 +1,4 @@
-@server = http://localhost:58068
+@server = http://localhost:62462
 @me = Authorization: Basic {{$processEnv USER}}:
 @basic = Authorization: Basic admin:admin
 
@@ -27,13 +27,6 @@ Content-Type: application/json
 GET {{server}}/odata/v4/catalog/Cnh
 
 
-###  UPLOAD Cnh
-POST {{server}}/odata/v4/catalog/uploadcnh
-Content-Type: application/json
-
-{
-"BlobUrl":"blob:https://sap-presales-br-usa.preview.us10.apps.build.cloud.sap/d18d24ef-9675-412c-abbf-fb1f23ff32da"
-}
 
 ###  UPLOAD Cnh DMS
 POST {{server}}/odata/v4/catalog/uploadcnhdms
@@ -44,7 +37,8 @@ Content-Type: application/json
 }
 
 
-
+###  UPLOAD Cnh DMS
+GET {{server}}/odata/v4/catalog/getURL()
 
 
 ### GET UPLOD URL EXTERNAL
@@ -73,7 +67,8 @@ Content-Type: application/json
 
 ### Upload Binary
 PUT {{server}}/odata/v4/catalog/Cnh(957a53fd-11a1-4c6c-804c-c956cb976f22)/imageContent
-Content-Type: image/jpeg
+
+
 
 < ./download.jpg
 
