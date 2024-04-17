@@ -273,11 +273,10 @@ async function doxUpload(ID, s3, bucket) {
     const response = await serviceCall( 'POST', 'text', 'default_sap-document-information-extraction', '/document-information-extraction/v1/document/jobs', null, formData );
     responseOjb = JSON.parse(response)
     if (responseOjb.status = 'PENDING') {
-        const oCNH = await tx.run(UPDATE(Cnh).set({ IDDOX : responseOjb.id, status: responseOjb.status}).where({ID:ID}));
+        await tx.run(UPDATE(Cnh).set({ IDDOX : responseOjb.id, status: responseOjb.status}).where({ID:ID}));
         await tx.commit();
-        console.log('IDDOX: '+ JSON.stringify(oCNH))
-        return oCNH;
-       
+        const oCnh =  await SELECT.one().from(cds.entities.Cnh).where({ID:ID});
+        return oCnh;
     }
 }
 

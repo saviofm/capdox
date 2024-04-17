@@ -1,4 +1,4 @@
-@server = http://localhost:62462
+@server = http://localhost:58567
 @me = Authorization: Basic {{$processEnv USER}}:
 @basic = Authorization: Basic admin:admin
 
@@ -65,37 +65,16 @@ Content-Type: application/json
   "obs": "Desc produto alterado"
 }
 
-### Upload Binary
-PUT {{server}}/odata/v4/catalog/Cnh(957a53fd-11a1-4c6c-804c-c956cb976f22)/imageContent
-
-
-
-< ./download.jpg
-
-
 
 
 ### Upload Binary
 PUT {{server}}/odata/v4/catalog/Cnh/957a53fd-11a1-4c6c-804c-c956cb976f22/imageContent
-Content-Type: image/png
-
-< ./Test.png
-
-
-### Upload Binary
-    
-PUT https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.us10.hana.ondemand.com/odata/v4/catalog/Cnh/c1514537-e5f1-492d-adf9-c70415f39d8a/imageContent   
-#https://sap-presales-brazil---btp-sap-presales-br-usa-dev-capdox-srv.cfapps.us10.hana.ondemand.com/odata/v4/catalog/Cnh(cf31b7df-51a6-47a2-a860-f6f0e1e1960a)/imageContent
 Content-Type: image/jpeg
 
-< ./download.jpg
+< ./cnh.jpg
 
 
-### Post Image Content
-POST  {{server}}/odata/v4/catalog/postImageContent
-Content-Type: image/jpeg
 
-< ./download.jpg
 
 
 ### Delete Cnh Content
